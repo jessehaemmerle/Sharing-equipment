@@ -1,53 +1,907 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import './App.css';
+import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
+// Auth Context
+const AuthContext = createContext();
+
+const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      fetchCurrentUser();
+    }
+  }, [token]);
+
+  const fetchCurrentUser = async () => {
     try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+      const response = await axios.get(`${API}/auth/me`);
+      setUser(response.data);
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+      logout();
     }
   };
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post(`${API}/auth/login`, { email, password });
+      const { access_token, user: userData } = response.data;
+      setToken(access_token);
+      setUser(userData);
+      localStorage.setItem('token', access_token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.detail || 'Login failed' };
+    }
+  };
+
+  const register = async (userData) => {
+    try {
+      const response = await axios.post(`${API}/auth/register`, userData);
+      const { access_token, user: newUser } = response.data;
+      setToken(access_token);
+      setUser(newUser);
+      localStorage.setItem('token', access_token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.detail || 'Registration failed' };
+    }
+  };
+
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+  };
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+
+// Navigation Component
+const Navigation = () => {
+  const { user, logout } = useAuth();
+  const [currentView, setCurrentView] = useState('home');
+
+  return (
+    <nav className="bg-white shadow-lg sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <button
+              onClick={() => setCurrentView('home')}
+              className="text-2xl font-bold text-blue-600 hover:text-blue-700"
+            >
+              toala.at
+            </button>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <button
+                  onClick={() => setCurrentView('browse')}
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+                >
+                  Browse
+                </button>
+                <button
+                  onClick={() => setCurrentView('my-equipment')}
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+                >
+                  My Equipment
+                </button>
+                <button
+                  onClick={() => setCurrentView('requests')}
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+                >
+                  Requests
+                </button>
+                <button
+                  onClick={() => setCurrentView('add-equipment')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium"
+                >
+                  List Equipment
+                </button>
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-700">Hi, {user.name}</span>
+                  <button
+                    onClick={logout}
+                    className="text-gray-500 hover:text-red-600"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setCurrentView('login')}
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => setCurrentView('register')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <ViewSwitcher currentView={currentView} setCurrentView={setCurrentView} />
+    </nav>
+  );
+};
+
+// View Switcher
+const ViewSwitcher = ({ currentView, setCurrentView }) => {
+  const { user } = useAuth();
+
+  const renderView = () => {
+    switch (currentView) {
+      case 'home':
+        return <HomePage setCurrentView={setCurrentView} />;
+      case 'login':
+        return <LoginForm setCurrentView={setCurrentView} />;
+      case 'register':
+        return <RegisterForm setCurrentView={setCurrentView} />;
+      case 'browse':
+        return user ? <BrowseEquipment setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
+      case 'my-equipment':
+        return user ? <MyEquipment setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
+      case 'add-equipment':
+        return user ? <AddEquipment setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
+      case 'requests':
+        return user ? <RequestsPage setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
+      case 'equipment-detail':
+        return user ? <EquipmentDetail setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
+      default:
+        return <HomePage setCurrentView={setCurrentView} />;
+    }
+  };
+
+  return <div>{renderView()}</div>;
+};
+
+// Home Page
+const HomePage = ({ setCurrentView }) => {
+  const { user } = useAuth();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/5064868/pexels-photo-5064868.jpeg"
+            alt="Equipment sharing community"
+            className="w-full h-full object-cover opacity-30"
+          />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold mb-6">
+              Lend, Borrow, Build Community
+            </h1>
+            <p className="text-xl mb-8 max-w-3xl mx-auto">
+              Turn your unused equipment into income. Find the tools you need from neighbors. 
+              Join Austria's leading equipment sharing marketplace.
+            </p>
+            <div className="space-x-4">
+              {user ? (
+                <>
+                  <button
+                    onClick={() => setCurrentView('browse')}
+                    className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
+                  >
+                    Browse Equipment
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('add-equipment')}
+                    className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition duration-300"
+                  >
+                    List Your Equipment
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setCurrentView('register')}
+                    className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
+                  >
+                    Get Started
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('login')}
+                    className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition duration-300"
+                  >
+                    Sign In
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Toala.at?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              The easiest way to share equipment in your community
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <img
+                  src="https://images.unsplash.com/photo-1546827209-a218e99fdbe9"
+                  alt="Power tools"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Quality Equipment</h3>
+              <p className="text-gray-600">
+                From power tools to lawn equipment, find high-quality gear from trusted community members.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <img
+                  src="https://images.unsplash.com/photo-1458245201577-fc8a130b8829"
+                  alt="Lawn equipment"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Local Community</h3>
+              <p className="text-gray-600">
+                Connect with neighbors and build lasting relationships while saving money and space.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-orange-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <img
+                  src="https://images.pexels.com/photos/5845902/pexels-photo-5845902.jpeg"
+                  alt="Welding equipment"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Easy & Secure</h3>
+              <p className="text-gray-600">
+                Simple booking process with built-in messaging and secure payment handling.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              How It Works
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-xl shadow-md">
+              <div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mb-6 text-xl font-bold">
+                1
+              </div>
+              <h3 className="text-xl font-semibold mb-4">List or Browse</h3>
+              <p className="text-gray-600">
+                List your unused equipment or browse available tools in your area.
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-xl shadow-md">
+              <div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mb-6 text-xl font-bold">
+                2
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Connect & Chat</h3>
+              <p className="text-gray-600">
+                Send requests and chat with equipment owners to arrange pickup times.
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-xl shadow-md">
+              <div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mb-6 text-xl font-bold">
+                3
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Share & Earn</h3>
+              <p className="text-gray-600">
+                Complete the rental, pay securely, and build your community reputation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold mb-4">
+            Ready to Start Sharing?
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Join thousands of Austrians already sharing equipment and building stronger communities.
+          </p>
+          {!user && (
+            <button
+              onClick={() => setCurrentView('register')}
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
+            >
+              Join Toala.at Today
+            </button>
+          )}
+        </div>
+      </section>
     </div>
   );
 };
 
+// Login Form
+const LoginForm = ({ setCurrentView }) => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const result = await login(formData.email, formData.password);
+    
+    if (result.success) {
+      setCurrentView('home');
+    } else {
+      setError(result.error);
+    }
+    
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900">Sign in to your account</h2>
+          <p className="mt-2 text-gray-600">
+            Or{' '}
+            <button
+              onClick={() => setCurrentView('register')}
+              className="text-blue-600 hover:text-blue-500"
+            >
+              create a new account
+            </button>
+          </p>
+        </div>
+        
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <input
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Register Form
+const RegisterForm = ({ setCurrentView }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    location: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const result = await register(formData);
+    
+    if (result.success) {
+      setCurrentView('home');
+    } else {
+      setError(result.error);
+    }
+    
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
+          <p className="mt-2 text-gray-600">
+            Or{' '}
+            <button
+              onClick={() => setCurrentView('login')}
+              className="text-blue-600 hover:text-blue-500"
+            >
+              sign in to existing account
+            </button>
+          </p>
+        </div>
+        
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Full Name</label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <input
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Phone (Optional)</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Location (City)</label>
+              <input
+                type="text"
+                required
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                placeholder="e.g., Vienna, Salzburg, Innsbruck"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Browse Equipment Component
+const BrowseEquipment = ({ setCurrentView }) => {
+  const [equipment, setEquipment] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    category: '',
+    location: '',
+    max_price: ''
+  });
+
+  useEffect(() => {
+    fetchEquipment();
+  }, [filters]);
+
+  const fetchEquipment = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (filters.category) params.append('category', filters.category);
+      if (filters.location) params.append('location', filters.location);
+      if (filters.max_price) params.append('max_price', filters.max_price);
+      
+      const response = await axios.get(`${API}/equipment?${params}`);
+      setEquipment(response.data);
+    } catch (error) {
+      console.error('Failed to fetch equipment:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const categories = [
+    { value: 'power_tools', label: 'Power Tools' },
+    { value: 'lawn_equipment', label: 'Lawn Equipment' },
+    { value: 'welding_equipment', label: 'Welding Equipment' },
+    { value: 'construction_tools', label: 'Construction Tools' },
+    { value: 'automotive', label: 'Automotive' },
+    { value: 'household', label: 'Household' },
+    { value: 'other', label: 'Other' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Browse Equipment</h1>
+          
+          {/* Filters */}
+          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  value={filters.category}
+                  onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(cat => (
+                    <option key={cat.value} value={cat.value}>{cat.label}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <input
+                  type="text"
+                  value={filters.location}
+                  onChange={(e) => setFilters({ ...filters, location: e.target.value })}
+                  placeholder="City or region"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max Price per Day (€)</label>
+                <input
+                  type="number"
+                  value={filters.max_price}
+                  onChange={(e) => setFilters({ ...filters, max_price: e.target.value })}
+                  placeholder="Maximum price"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Equipment Grid */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="text-gray-600">Loading equipment...</div>
+          </div>
+        ) : equipment.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-600">No equipment found matching your criteria.</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {equipment.map((item) => (
+              <EquipmentCard key={item.id} equipment={item} setCurrentView={setCurrentView} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Equipment Card Component
+const EquipmentCard = ({ equipment, setCurrentView }) => {
+  const handleViewDetails = () => {
+    window.selectedEquipment = equipment;
+    setCurrentView('equipment-detail');
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+      {equipment.images && equipment.images.length > 0 && (
+        <img
+          src={`data:image/jpeg;base64,${equipment.images[0]}`}
+          alt={equipment.title}
+          className="w-full h-48 object-cover"
+        />
+      )}
+      
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-lg font-semibold text-gray-900">{equipment.title}</h3>
+          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+            {equipment.category.replace('_', ' ')}
+          </span>
+        </div>
+        
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{equipment.description}</p>
+        
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-2xl font-bold text-green-600">€{equipment.price_per_day}/day</span>
+          <span className="text-sm text-gray-500">{equipment.location}</span>
+        </div>
+        
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-gray-500">by {equipment.owner_name}</span>
+          <button
+            onClick={handleViewDetails}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
+          >
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Equipment Detail Component (stub for now)
+const EquipmentDetail = ({ setCurrentView }) => {
+  const equipment = window.selectedEquipment;
+  
+  if (!equipment) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-gray-600 mb-4">Equipment not found</div>
+          <button
+            onClick={() => setCurrentView('browse')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Back to Browse
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button
+          onClick={() => setCurrentView('browse')}
+          className="mb-6 text-blue-600 hover:text-blue-700 flex items-center"
+        >
+          ← Back to Browse
+        </button>
+        
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {equipment.images && equipment.images.length > 0 && (
+            <img
+              src={`data:image/jpeg;base64,${equipment.images[0]}`}
+              alt={equipment.title}
+              className="w-full h-64 object-cover"
+            />
+          )}
+          
+          <div className="p-8">
+            <div className="flex justify-between items-start mb-4">
+              <h1 className="text-3xl font-bold text-gray-900">{equipment.title}</h1>
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                {equipment.category.replace('_', ' ')}
+              </span>
+            </div>
+            
+            <p className="text-gray-600 mb-6">{equipment.description}</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Rental Details</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Price per day:</span>
+                    <span className="font-semibold text-green-600">€{equipment.price_per_day}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Minimum rental:</span>
+                    <span>{equipment.min_rental_days} day(s)</span>
+                  </div>
+                  {equipment.max_rental_days && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Maximum rental:</span>
+                      <span>{equipment.max_rental_days} day(s)</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Owner Information</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Owner:</span>
+                    <span>{equipment.owner_name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Location:</span>
+                    <span>{equipment.location}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 pt-6 border-t">
+              <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 text-lg font-semibold">
+                Send Rental Request
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// My Equipment Component (stub)
+const MyEquipment = ({ setCurrentView }) => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Equipment</h1>
+        <div className="text-center py-12">
+          <div className="text-gray-600 mb-4">Feature coming soon!</div>
+          <button
+            onClick={() => setCurrentView('add-equipment')}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+          >
+            Add Equipment
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Add Equipment Component (stub)
+const AddEquipment = ({ setCurrentView }) => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">List Equipment</h1>
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="text-center py-12">
+            <div className="text-gray-600 mb-4">Equipment listing form coming soon!</div>
+            <button
+              onClick={() => setCurrentView('browse')}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+            >
+              Browse Equipment
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Requests Page Component (stub)
+const RequestsPage = ({ setCurrentView }) => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Rental Requests</h1>
+        <div className="text-center py-12">
+          <div className="text-gray-600 mb-4">Requests management coming soon!</div>
+          <button
+            onClick={() => setCurrentView('browse')}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+          >
+            Browse Equipment
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main App Component
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <Navigation />
+      </div>
+    </AuthProvider>
   );
 }
 
