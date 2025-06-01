@@ -258,8 +258,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User Authentication UI"
-    - "Equipment Browse and Search"
+    - "Equipment Listing Creation"
+    - "Rental Request Management"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
