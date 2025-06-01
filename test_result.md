@@ -101,3 +101,147 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Create an App for people to lend out their unused equipment like welding machines, lawn mowers, chainsaws, etc. To other people. Let the lending person create a listing for what they have to offer, set a price and availability. Then make it so interested people can send a request for a certain tool and the lender and interested person can then chat and agree on a time frame. The availability of the tool should then also be automatically updated aswell."
+
+backend:
+  - task: "User Authentication System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented JWT-based authentication with registration and login endpoints. Includes password hashing with bcrypt, email validation, and user profile management."
+
+  - task: "Equipment Listing CRUD Operations"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented equipment model with image storage (base64), categories, pricing, location, and availability calendar. Includes create, read, search, and filter endpoints."
+
+  - task: "Rental Request System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented rental request creation, status management (pending/approved/declined/completed), price calculation, and request viewing for both lenders and borrowers."
+
+  - task: "Messaging System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented basic messaging system tied to rental requests. Users can send messages within request context and view message history."
+
+  - task: "Location-based Search"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented basic location search by city/region using text matching. Equipment endpoints support location filtering."
+
+frontend:
+  - task: "User Authentication UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented login and registration forms with React context for auth state management. Includes form validation and error handling."
+
+  - task: "Landing Page and Navigation"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created professional landing page with toala.at branding, hero section, features, and how-it-works sections. Implemented responsive navigation."
+
+  - task: "Equipment Browse and Search"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented equipment browsing with filters (category, location, price), equipment cards with images, and equipment detail view."
+
+  - task: "Equipment Listing Creation"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "Currently shows placeholder for equipment listing form. Needs to be implemented with image upload, form validation, and category selection."
+
+  - task: "Rental Request Management"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "Shows placeholder for request management. Needs implementation for sending requests, viewing received/sent requests, and status updates."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "User Authentication System"
+    - "Equipment Listing CRUD Operations"
+    - "Equipment Browse and Search"
+    - "User Authentication UI"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Initial implementation of core marketplace features completed. Backend includes full authentication, equipment CRUD, rental requests, and messaging. Frontend has landing page, auth forms, and equipment browsing. Ready for backend testing to validate API endpoints and authentication flow."
