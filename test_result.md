@@ -249,10 +249,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User Authentication System"
-    - "Equipment Listing CRUD Operations"
-    - "Equipment Browse and Search"
     - "User Authentication UI"
+    - "Equipment Browse and Search"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
