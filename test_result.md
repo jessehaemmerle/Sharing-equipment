@@ -107,63 +107,78 @@ user_problem_statement: "Create an App for people to lend out their unused equip
 backend:
   - task: "User Authentication System"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented JWT-based authentication with registration and login endpoints. Includes password hashing with bcrypt, email validation, and user profile management."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested user registration, login, and JWT token validation. Registration creates a new user with hashed password and returns a valid JWT token. Login authenticates users correctly and returns a valid token. JWT tokens are properly validated when accessing protected endpoints."
 
   - task: "Equipment Listing CRUD Operations"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented equipment model with image storage (base64), categories, pricing, location, and availability calendar. Includes create, read, search, and filter endpoints."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested equipment creation, retrieval by ID, listing all equipment, and filtering. Equipment creation properly stores all fields including images as base64. Get by ID returns correct equipment details. Listing and filtering by category, location, and price work as expected."
 
   - task: "Rental Request System"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented rental request creation, status management (pending/approved/declined/completed), price calculation, and request viewing for both lenders and borrowers."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested rental request creation, viewing sent/received requests, and status updates. Request creation calculates total price correctly based on rental duration. Both lender and borrower can view their respective requests. Status updates (approve/decline/complete) work correctly and are properly restricted to equipment owners."
 
   - task: "Messaging System"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented basic messaging system tied to rental requests. Users can send messages within request context and view message history."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested message sending and retrieval within rental request context. Both lender and borrower can send messages to each other. Messages are properly associated with the rental request and can be retrieved in chronological order. Message history shows sender and recipient details correctly."
 
   - task: "Location-based Search"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented basic location search by city/region using text matching. Equipment endpoints support location filtering."
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested location-based search functionality. Equipment can be filtered by location using text matching. Created test equipment in Vienna and verified it appears in location-based search results. The implementation correctly handles partial location name matching using case-insensitive regex search."
 
 frontend:
   - task: "User Authentication UI"
