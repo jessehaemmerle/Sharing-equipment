@@ -832,21 +832,110 @@ const EquipmentDetail = ({ setCurrentView }) => {
   );
 };
 
-// My Equipment Component (stub)
+// My Equipment Component
 const MyEquipment = ({ setCurrentView }) => {
+  const [equipment, setEquipment] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchMyEquipment();
+  }, []);
+
+  const fetchMyEquipment = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API}/my-equipment`);
+      setEquipment(response.data);
+    } catch (error) {
+      setError('Failed to fetch equipment');
+      console.error('Failed to fetch equipment:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading your equipment...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Equipment</h1>
-        <div className="text-center py-12">
-          <div className="text-gray-600 mb-4">Feature coming soon!</div>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My Equipment</h1>
           <button
             onClick={() => setCurrentView('add-equipment')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
           >
-            Add Equipment
+            + Add Equipment
           </button>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        {equipment.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-600 mb-4">You haven't listed any equipment yet.</div>
+            <button
+              onClick={() => setCurrentView('add-equipment')}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+            >
+              List Your First Equipment
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {equipment.map((item) => (
+              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                {item.images && item.images.length > 0 && (
+                  <img
+                    src={`data:image/jpeg;base64,${item.images[0]}`}
+                    alt={item.title}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      item.is_available 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {item.is_available ? 'Available' : 'Unavailable'}
+                    </span>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.description}</p>
+                  
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-2xl font-bold text-green-600">€{item.price_per_day}/day</span>
+                    <span className="text-sm text-gray-500">{item.location}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">
+                      Category: {item.category.replace('_', ' ')}
+                    </span>
+                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
