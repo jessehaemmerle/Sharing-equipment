@@ -852,23 +852,255 @@ const MyEquipment = ({ setCurrentView }) => {
   );
 };
 
-// Add Equipment Component (stub)
+// Add Equipment Component
 const AddEquipment = ({ setCurrentView }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'power_tools',
+    price_per_day: '',
+    location: '',
+    min_rental_days: 1,
+    max_rental_days: ''
+  });
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const categories = [
+    { value: 'power_tools', label: 'Power Tools' },
+    { value: 'lawn_equipment', label: 'Lawn Equipment' },
+    { value: 'welding_equipment', label: 'Welding Equipment' },
+    { value: 'construction_tools', label: 'Construction Tools' },
+    { value: 'automotive', label: 'Automotive' },
+    { value: 'household', label: 'Household' },
+    { value: 'other', label: 'Other' }
+  ];
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + images.length > 10) {
+      setError('Maximum 10 images allowed');
+      return;
+    }
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target.result.split(',')[1]; // Remove data:image/...;base64, prefix
+        setImages(prev => [...prev, base64]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const equipmentData = {
+        ...formData,
+        price_per_day: parseFloat(formData.price_per_day),
+        max_rental_days: formData.max_rental_days ? parseInt(formData.max_rental_days) : null,
+        images: images
+      };
+
+      const response = await axios.post(`${API}/equipment`, equipmentData);
+      
+      if (response.status === 200) {
+        setSuccess(true);
+        setTimeout(() => {
+          setCurrentView('my-equipment');
+        }, 2000);
+      }
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Failed to create equipment listing');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+          <div className="text-green-600 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Equipment Listed Successfully!</h2>
+          <p className="text-gray-600">Your equipment is now available for rent.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">List Equipment</h1>
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="text-center py-12">
-            <div className="text-gray-600 mb-4">Equipment listing form coming soon!</div>
+        <div className="mb-6">
+          <button
+            onClick={() => setCurrentView('browse')}
+            className="text-blue-600 hover:text-blue-700 flex items-center"
+          >
+            ← Back to Browse
+          </button>
+        </div>
+
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">List Your Equipment</h1>
+        
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6">
+              {error}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Equipment Title</label>
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="e.g., Professional Welding Machine"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                required
+                rows={4}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Describe your equipment, its condition, and any special requirements..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {categories.map(cat => (
+                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Price per Day (€)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                value={formData.price_per_day}
+                onChange={(e) => setFormData({ ...formData, price_per_day: e.target.value })}
+                placeholder="25.00"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <input
+                type="text"
+                required
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                placeholder="Vienna, Salzburg, etc."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Rental Days</label>
+              <input
+                type="number"
+                min="1"
+                value={formData.min_rental_days}
+                onChange={(e) => setFormData({ ...formData, min_rental_days: parseInt(e.target.value) })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Maximum Rental Days (Optional)</label>
+              <input
+                type="number"
+                min="1"
+                value={formData.max_rental_days}
+                onChange={(e) => setFormData({ ...formData, max_rental_days: e.target.value })}
+                placeholder="30"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 10)</label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              
+              {images.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {images.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={`data:image/jpeg;base64,${image}`}
+                        alt={`Upload ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-end space-x-4">
             <button
+              type="button"
               onClick={() => setCurrentView('browse')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
-              Browse Equipment
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? 'Creating...' : 'List Equipment'}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
