@@ -735,9 +735,19 @@ const EquipmentCard = ({ equipment, setCurrentView }) => {
   );
 };
 
-// Equipment Detail Component (stub for now)
+// Equipment Detail Component
 const EquipmentDetail = ({ setCurrentView }) => {
   const equipment = window.selectedEquipment;
+  const { user } = useAuth();
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [requestForm, setRequestForm] = useState({
+    start_date: '',
+    end_date: '',
+    message: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
   
   if (!equipment) {
     return (
@@ -755,6 +765,63 @@ const EquipmentDetail = ({ setCurrentView }) => {
     );
   }
 
+  const isOwner = user && user.id === equipment.owner_id;
+
+  const handleRequestSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const requestData = {
+        equipment_id: equipment.id,
+        start_date: new Date(requestForm.start_date).toISOString(),
+        end_date: new Date(requestForm.end_date).toISOString(),
+        message: requestForm.message
+      };
+
+      const response = await axios.post(`${API}/requests`, requestData);
+      
+      if (response.status === 200) {
+        setSuccess(true);
+        setShowRequestForm(false);
+        setTimeout(() => {
+          setCurrentView('requests');
+        }, 2000);
+      }
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Failed to send request');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateTotalPrice = () => {
+    if (requestForm.start_date && requestForm.end_date) {
+      const start = new Date(requestForm.start_date);
+      const end = new Date(requestForm.end_date);
+      const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+      return days * equipment.price_per_day;
+    }
+    return 0;
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+          <div className="text-green-600 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Request Sent Successfully!</h2>
+          <p className="text-gray-600">The equipment owner will review your request.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -767,11 +834,18 @@ const EquipmentDetail = ({ setCurrentView }) => {
         
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {equipment.images && equipment.images.length > 0 && (
-            <img
-              src={`data:image/jpeg;base64,${equipment.images[0]}`}
-              alt={equipment.title}
-              className="w-full h-64 object-cover"
-            />
+            <div className="relative">
+              <img
+                src={`data:image/jpeg;base64,${equipment.images[0]}`}
+                alt={equipment.title}
+                className="w-full h-64 object-cover"
+              />
+              {equipment.images.length > 1 && (
+                <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
+                  {equipment.images.length} photos
+                </div>
+              )}
+            </div>
           )}
           
           <div className="p-8">
@@ -820,10 +894,103 @@ const EquipmentDetail = ({ setCurrentView }) => {
               </div>
             </div>
             
+            {error && (
+              <div className="mt-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
+            
             <div className="mt-8 pt-6 border-t">
-              <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 text-lg font-semibold">
-                Send Rental Request
-              </button>
+              {!user ? (
+                <div className="text-center">
+                  <p className="text-gray-600 mb-4">Please login to send a rental request</p>
+                  <button 
+                    onClick={() => setCurrentView('login')}
+                    className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 text-lg font-semibold"
+                  >
+                    Login to Request
+                  </button>
+                </div>
+              ) : isOwner ? (
+                <div className="text-center">
+                  <p className="text-gray-600">This is your equipment listing</p>
+                </div>
+              ) : showRequestForm ? (
+                <form onSubmit={handleRequestSubmit} className="space-y-4">
+                  <h3 className="text-lg font-semibold mb-4">Send Rental Request</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                      <input
+                        type="date"
+                        required
+                        value={requestForm.start_date}
+                        onChange={(e) => setRequestForm({ ...requestForm, start_date: e.target.value })}
+                        min={new Date().toISOString().split('T')[0]}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                      <input
+                        type="date"
+                        required
+                        value={requestForm.end_date}
+                        onChange={(e) => setRequestForm({ ...requestForm, end_date: e.target.value })}
+                        min={requestForm.start_date || new Date().toISOString().split('T')[0]}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  
+                  {requestForm.start_date && requestForm.end_date && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span>Total Price:</span>
+                        <span className="text-xl font-bold text-blue-600">€{calculateTotalPrice()}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Message to Owner</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={requestForm.message}
+                      onChange={(e) => setRequestForm({ ...requestForm, message: e.target.value })}
+                      placeholder="Tell the owner about your rental needs..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowRequestForm(false)}
+                      className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {loading ? 'Sending...' : 'Send Request'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <button 
+                  onClick={() => setShowRequestForm(true)}
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 text-lg font-semibold"
+                >
+                  Send Rental Request
+                </button>
+              )}
             </div>
           </div>
         </div>
