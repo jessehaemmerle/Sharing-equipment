@@ -1146,8 +1146,8 @@ const AddEquipment = ({ setCurrentView }) => {
     files.forEach(file => {
       const reader = new FileReader();
       reader.onload = (event) => {
-        const base64 = event.target.result.split(',')[1]; // Remove data:image/...;base64, prefix
-        setImages(prev => [...prev, base64]);
+        const fullDataUrl = event.target.result; // Keep the full data URL
+        setImages(prev => [...prev, fullDataUrl]);
       };
       reader.readAsDataURL(file);
     });
