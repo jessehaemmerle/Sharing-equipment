@@ -838,7 +838,7 @@ const EquipmentDetail = ({ setCurrentView }) => {
           {equipment.images && equipment.images.length > 0 && (
             <div className="relative">
               <img
-                src={`data:image/jpeg;base64,${equipment.images[0]}`}
+                src={equipment.images[0].startsWith('data:') ? equipment.images[0] : `data:image/jpeg;base64,${equipment.images[0]}`}
                 alt={equipment.title}
                 className="w-full h-64 object-cover"
               />
