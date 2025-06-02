@@ -1067,7 +1067,7 @@ const MyEquipment = ({ setCurrentView }) => {
               <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 {item.images && item.images.length > 0 && (
                   <img
-                    src={`data:image/jpeg;base64,${item.images[0]}`}
+                    src={item.images[0].startsWith('data:') ? item.images[0] : `data:image/jpeg;base64,${item.images[0]}`}
                     alt={item.title}
                     className="w-full h-48 object-cover"
                   />
