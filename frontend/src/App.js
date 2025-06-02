@@ -181,6 +181,8 @@ const ViewSwitcher = ({ currentView, setCurrentView }) => {
         return user ? <RequestsPage setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
       case 'equipment-detail':
         return user ? <EquipmentDetail setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
+      case 'chat':
+        return user ? <ChatPage setCurrentView={setCurrentView} /> : <HomePage setCurrentView={setCurrentView} />;
       default:
         return <HomePage setCurrentView={setCurrentView} />;
     }
