@@ -228,15 +228,18 @@ frontend:
 
   - task: "Equipment Listing Creation"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented full equipment listing form with image upload (max 10), category selection, pricing, location, and rental duration settings. Includes form validation and base64 image storage."
+      - working: false
+        agent: "testing"
+        comment: "Equipment listing form displays correctly with all required fields (title, description, category, price, location, rental duration, image upload). Form can be filled out and submitted, but the equipment does not appear in the My Equipment section after submission. The form redirects to My Equipment page, but no equipment is displayed. No error messages are shown during submission."
 
   - task: "Rental Request Management"
     implemented: true
