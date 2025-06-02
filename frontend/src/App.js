@@ -702,7 +702,7 @@ const EquipmentCard = ({ equipment, setCurrentView }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {equipment.images && equipment.images.length > 0 && (
         <img
-          src={`data:image/jpeg;base64,${equipment.images[0]}`}
+          src={equipment.images[0].startsWith('data:') ? equipment.images[0] : `data:image/jpeg;base64,${equipment.images[0]}`}
           alt={equipment.title}
           className="w-full h-48 object-cover"
         />
