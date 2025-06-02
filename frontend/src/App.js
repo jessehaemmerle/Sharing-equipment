@@ -1324,7 +1324,7 @@ const AddEquipment = ({ setCurrentView }) => {
                   {images.map((image, index) => (
                     <div key={index} className="relative">
                       <img
-                        src={`data:image/jpeg;base64,${image}`}
+                        src={image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`}
                         alt={`Upload ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg"
                       />
