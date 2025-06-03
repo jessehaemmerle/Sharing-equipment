@@ -990,7 +990,7 @@ const EquipmentDetail = ({ setCurrentView }) => {
                   onClick={() => setShowRequestForm(true)}
                   className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 text-lg font-semibold"
                 >
-                  Send Rental Request
+                  Mietanfrage senden
                 </button>
               )}
             </div>
