@@ -1209,11 +1209,11 @@ const AddEquipment = ({ setCurrentView }) => {
             onClick={() => setCurrentView('browse')}
             className="text-blue-600 hover:text-blue-700 flex items-center"
           >
-            ← Back to Browse
+            ← Zurück zum Durchsuchen
           </button>
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">List Your Equipment</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dein Gerät inserieren</h1>
         
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8">
           {error && (
