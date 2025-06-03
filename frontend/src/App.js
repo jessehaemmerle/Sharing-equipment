@@ -257,10 +257,10 @@ const HomePage = ({ setCurrentView }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Toala.at?
+              Warum Toala.at wählen?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The easiest way to share equipment in your community
+              Der einfachste Weg, Geräte in deiner Gemeinde zu teilen
             </p>
           </div>
           
@@ -269,13 +269,13 @@ const HomePage = ({ setCurrentView }) => {
               <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <img
                   src="https://images.unsplash.com/photo-1546827209-a218e99fdbe9"
-                  alt="Power tools"
+                  alt="Elektrowerkzeuge"
                   className="w-12 h-12 rounded-full object-cover"
                 />
               </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Quality Equipment</h3>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Qualitätsgeräte</h3>
               <p className="text-gray-600">
-                From power tools to lawn equipment, find high-quality gear from trusted community members.
+                Von Elektrowerkzeugen bis zu Gartengeräten, finde hochwertige Ausrüstung von vertrauenswürdigen Nachbarn.
               </p>
             </div>
             
@@ -283,13 +283,13 @@ const HomePage = ({ setCurrentView }) => {
               <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <img
                   src="https://images.unsplash.com/photo-1458245201577-fc8a130b8829"
-                  alt="Lawn equipment"
+                  alt="Gartengeräte"
                   className="w-12 h-12 rounded-full object-cover"
                 />
               </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Local Community</h3>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Lokale Gemeinschaft</h3>
               <p className="text-gray-600">
-                Connect with neighbors and build lasting relationships while saving money and space.
+                Verbinde dich mit Nachbarn und baue dauerhafte Beziehungen auf, während du Geld und Platz sparst.
               </p>
             </div>
             
@@ -297,13 +297,13 @@ const HomePage = ({ setCurrentView }) => {
               <div className="bg-orange-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <img
                   src="https://images.pexels.com/photos/5845902/pexels-photo-5845902.jpeg"
-                  alt="Welding equipment"
+                  alt="Schweißgeräte"
                   className="w-12 h-12 rounded-full object-cover"
                 />
               </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Easy & Secure</h3>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Einfach & Sicher</h3>
               <p className="text-gray-600">
-                Simple booking process with built-in messaging and secure payment handling.
+                Einfacher Buchungsprozess mit integriertem Messaging und sicherer Bezahlungsabwicklung.
               </p>
             </div>
           </div>
