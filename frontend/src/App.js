@@ -862,34 +862,34 @@ const EquipmentDetail = ({ setCurrentView }) => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-lg font-semibold mb-3">Rental Details</h3>
+                <h3 className="text-lg font-semibold mb-3">Mietdetails</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Price per day:</span>
+                    <span className="text-gray-600">Preis pro Tag:</span>
                     <span className="font-semibold text-green-600">€{equipment.price_per_day}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Minimum rental:</span>
-                    <span>{equipment.min_rental_days} day(s)</span>
+                    <span className="text-gray-600">Mindestmietdauer:</span>
+                    <span>{equipment.min_rental_days} Tag(e)</span>
                   </div>
                   {equipment.max_rental_days && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Maximum rental:</span>
-                      <span>{equipment.max_rental_days} day(s)</span>
+                      <span className="text-gray-600">Maximale Mietdauer:</span>
+                      <span>{equipment.max_rental_days} Tag(e)</span>
                     </div>
                   )}
                 </div>
               </div>
               
               <div>
-                <h3 className="text-lg font-semibold mb-3">Owner Information</h3>
+                <h3 className="text-lg font-semibold mb-3">Besitzer-Informationen</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Owner:</span>
+                    <span className="text-gray-600">Besitzer:</span>
                     <span>{equipment.owner_name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Location:</span>
+                    <span className="text-gray-600">Standort:</span>
                     <span>{equipment.location}</span>
                   </div>
                 </div>
