@@ -915,7 +915,7 @@ const EquipmentDetail = ({ setCurrentView }) => {
                 </div>
               ) : isOwner ? (
                 <div className="text-center">
-                  <p className="text-gray-600">This is your equipment listing</p>
+                  <p className="text-gray-600">Das ist dein Geräteeintrag</p>
                 </div>
               ) : showRequestForm ? (
                 <form onSubmit={handleRequestSubmit} className="space-y-4">
