@@ -140,13 +140,13 @@ const Navigation = () => {
                   onClick={() => setCurrentView('login')}
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
                 >
-                  Login
+                  Anmelden
                 </button>
                 <button
                   onClick={() => setCurrentView('register')}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium"
                 >
-                  Sign Up
+                  Registrieren
                 </button>
               </>
             )}
