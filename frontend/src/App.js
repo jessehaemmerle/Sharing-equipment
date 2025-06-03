@@ -492,14 +492,14 @@ const RegisterForm = ({ setCurrentView }) => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Konto erstellen</h2>
           <p className="mt-2 text-gray-600">
-            Or{' '}
+            Oder{' '}
             <button
               onClick={() => setCurrentView('login')}
               className="text-blue-600 hover:text-blue-500"
             >
-              sign in to existing account
+              bei bestehendem Konto anmelden
             </button>
           </p>
         </div>
@@ -513,7 +513,7 @@ const RegisterForm = ({ setCurrentView }) => {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Full Name</label>
+              <label className="block text-sm font-medium text-gray-700">Vollständiger Name</label>
               <input
                 type="text"
                 required
@@ -524,7 +524,7 @@ const RegisterForm = ({ setCurrentView }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className="block text-sm font-medium text-gray-700">E-Mail</label>
               <input
                 type="email"
                 required
@@ -535,7 +535,7 @@ const RegisterForm = ({ setCurrentView }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <label className="block text-sm font-medium text-gray-700">Passwort</label>
               <input
                 type="password"
                 required
@@ -546,7 +546,7 @@ const RegisterForm = ({ setCurrentView }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">Phone (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700">Telefon (Optional)</label>
               <input
                 type="tel"
                 value={formData.phone}
@@ -556,13 +556,13 @@ const RegisterForm = ({ setCurrentView }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">Location (City)</label>
+              <label className="block text-sm font-medium text-gray-700">Standort (Stadt)</label>
               <input
                 type="text"
                 required
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="e.g., Vienna, Salzburg, Innsbruck"
+                placeholder="z.B. Wien, Salzburg, Innsbruck"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -573,7 +573,7 @@ const RegisterForm = ({ setCurrentView }) => {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Konto wird erstellt...' : 'Konto erstellen'}
           </button>
         </form>
       </div>
