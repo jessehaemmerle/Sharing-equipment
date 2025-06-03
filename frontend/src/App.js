@@ -817,8 +817,8 @@ const EquipmentDetail = ({ setCurrentView }) => {
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Request Sent Successfully!</h2>
-          <p className="text-gray-600">The equipment owner will review your request.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Anfrage erfolgreich gesendet!</h2>
+          <p className="text-gray-600">Der Gerätebesitzer wird deine Anfrage prüfen.</p>
         </div>
       </div>
     );
