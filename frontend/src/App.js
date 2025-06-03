@@ -905,12 +905,12 @@ const EquipmentDetail = ({ setCurrentView }) => {
             <div className="mt-8 pt-6 border-t">
               {!user ? (
                 <div className="text-center">
-                  <p className="text-gray-600 mb-4">Please login to send a rental request</p>
+                  <p className="text-gray-600 mb-4">Bitte melde dich an, um eine Mietanfrage zu senden</p>
                   <button 
                     onClick={() => setCurrentView('login')}
                     className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 text-lg font-semibold"
                   >
-                    Login to Request
+                    Anmelden für Anfrage
                   </button>
                 </div>
               ) : isOwner ? (
