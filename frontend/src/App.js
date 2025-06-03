@@ -1017,7 +1017,7 @@ const MyEquipment = ({ setCurrentView }) => {
       const response = await axios.get(`${API}/my-equipment`);
       setEquipment(response.data);
     } catch (error) {
-      setError('Failed to fetch equipment');
+      setError('Geräte konnten nicht geladen werden');
       console.error('Failed to fetch equipment:', error);
     } finally {
       setLoading(false);
@@ -1027,7 +1027,7 @@ const MyEquipment = ({ setCurrentView }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading your equipment...</div>
+        <div className="text-gray-600">Lade deine Geräte...</div>
       </div>
     );
   }
@@ -1036,12 +1036,12 @@ const MyEquipment = ({ setCurrentView }) => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Equipment</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Meine Geräte</h1>
           <button
             onClick={() => setCurrentView('add-equipment')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
           >
-            + Add Equipment
+            + Gerät hinzufügen
           </button>
         </div>
 
@@ -1053,12 +1053,12 @@ const MyEquipment = ({ setCurrentView }) => {
 
         {equipment.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-600 mb-4">You haven't listed any equipment yet.</div>
+            <div className="text-gray-600 mb-4">Du hast noch keine Geräte inseriert.</div>
             <button
               onClick={() => setCurrentView('add-equipment')}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
             >
-              List Your First Equipment
+              Dein erstes Gerät inserieren
             </button>
           </div>
         ) : (
@@ -1081,23 +1081,23 @@ const MyEquipment = ({ setCurrentView }) => {
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-red-100 text-red-800'
                     }`}>
-                      {item.is_available ? 'Available' : 'Unavailable'}
+                      {item.is_available ? 'Verfügbar' : 'Nicht verfügbar'}
                     </span>
                   </div>
                   
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.description}</p>
                   
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-2xl font-bold text-green-600">€{item.price_per_day}/day</span>
+                    <span className="text-2xl font-bold text-green-600">€{item.price_per_day}/Tag</span>
                     <span className="text-sm text-gray-500">{item.location}</span>
                   </div>
                   
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-500">
-                      Category: {item.category.replace('_', ' ')}
+                      Kategorie: {item.category.replace('_', ' ')}
                     </span>
                     <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                      Edit
+                      Bearbeiten
                     </button>
                   </div>
                 </div>
