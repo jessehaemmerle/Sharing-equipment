@@ -626,19 +626,19 @@ const BrowseEquipment = ({ setCurrentView }) => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Browse Equipment</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Geräte durchsuchen</h1>
           
           {/* Filters */}
           <div className="bg-white p-6 rounded-lg shadow-md mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
                 <select
                   value={filters.category}
                   onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">All Categories</option>
+                  <option value="">Alle Kategorien</option>
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
                   ))}
@@ -646,23 +646,23 @@ const BrowseEquipment = ({ setCurrentView }) => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Standort</label>
                 <input
                   type="text"
                   value={filters.location}
                   onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                  placeholder="City or region"
+                  placeholder="Stadt oder Region"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Max Price per Day (€)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max. Preis pro Tag (€)</label>
                 <input
                   type="number"
                   value={filters.max_price}
                   onChange={(e) => setFilters({ ...filters, max_price: e.target.value })}
-                  placeholder="Maximum price"
+                  placeholder="Maximaler Preis"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
