@@ -209,11 +209,11 @@ const HomePage = ({ setCurrentView }) => {
         <div className="relative max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">
-              Lend, Borrow, Build Community
+              Verleihen, Ausleihen, Gemeinschaft stärken
             </h1>
             <p className="text-xl mb-8 max-w-3xl mx-auto">
-              Turn your unused equipment into income. Find the tools you need from neighbors. 
-              Join Austria's leading equipment sharing marketplace.
+              Verwandle deine ungenutzten Geräte in Einkommen. Finde die Werkzeuge, die du brauchst, von Nachbarn. 
+              Werde Teil von Österreichs führendem Geräteverleih-Marktplatz.
             </p>
             <div className="space-x-4">
               {user ? (
@@ -222,13 +222,13 @@ const HomePage = ({ setCurrentView }) => {
                     onClick={() => setCurrentView('browse')}
                     className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
                   >
-                    Browse Equipment
+                    Geräte durchsuchen
                   </button>
                   <button
                     onClick={() => setCurrentView('add-equipment')}
                     className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition duration-300"
                   >
-                    List Your Equipment
+                    Deine Geräte inserieren
                   </button>
                 </>
               ) : (
@@ -237,13 +237,13 @@ const HomePage = ({ setCurrentView }) => {
                     onClick={() => setCurrentView('register')}
                     className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
                   >
-                    Get Started
+                    Jetzt starten
                   </button>
                   <button
                     onClick={() => setCurrentView('login')}
                     className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition duration-300"
                   >
-                    Sign In
+                    Anmelden
                   </button>
                 </>
               )}
