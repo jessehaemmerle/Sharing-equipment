@@ -673,11 +673,11 @@ const BrowseEquipment = ({ setCurrentView }) => {
         {/* Equipment Grid */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="text-gray-600">Loading equipment...</div>
+            <div className="text-gray-600">Lade Geräte...</div>
           </div>
         ) : equipment.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-600">No equipment found matching your criteria.</div>
+            <div className="text-gray-600">Keine Geräte gefunden, die deinen Kriterien entsprechen.</div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
