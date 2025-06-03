@@ -58,66 +58,63 @@ Before hosting toala.at, ensure you have:
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
+### Option 1: One-Command VPS Deployment (Ubuntu)
+
+Deploy to your Ubuntu VPS in minutes:
 
 ```bash
-git clone https://github.com/yourusername/toala-at.git
+# Upload project files to your VPS
+scp -r toala-at/ user@your-vps-ip:~/
+
+# SSH to your VPS
+ssh user@your-vps-ip
+
+# Run deployment script
 cd toala-at
+chmod +x deploy.sh
+./deploy.sh
 ```
 
-### 2. Backend Setup
+The script automatically installs Docker, configures firewall, and deploys the complete application!
+
+### Option 2: Local Development with Docker
 
 ```bash
-# Navigate to backend directory
+# Clone repository
+git clone <your-repo-url>
+cd toala-at
+
+# Quick start (builds and runs everything)
+chmod +x quick-start.sh
+./quick-start.sh
+
+# Manual approach
+docker-compose up --build -d
+```
+
+### Option 3: Manual Development Setup
+
+**Backend:**
+```bash
 cd backend
-
-# Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+source venv/bin/activate
 pip install -r requirements.txt
-
-# Create environment file
-cp .env.example .env
+uvicorn server:app --host 0.0.0.0 --port 8001 --reload
 ```
 
-### 3. Frontend Setup
-
+**Frontend:**
 ```bash
-# Navigate to frontend directory
-cd ../frontend
-
-# Install dependencies
+cd frontend
 yarn install
-
-# Create environment file
-cp .env.example .env
+yarn start
 ```
 
-### 4. Database Setup
-
-**Option A: Local MongoDB**
+**Database:**
 ```bash
-# Install MongoDB on your system
-# Ubuntu/Debian:
-sudo apt update
-sudo apt install mongodb
-
-# macOS (with Homebrew):
-brew tap mongodb/brew
-brew install mongodb-community
-
-# Start MongoDB service
-sudo systemctl start mongodb  # Linux
-brew services start mongodb/brew/mongodb-community  # macOS
+# Install and start MongoDB locally
+sudo systemctl start mongodb
 ```
-
-**Option B: MongoDB Atlas (Cloud)**
-1. Create account at [MongoDB Atlas](https://www.mongodb.com/atlas)
-2. Create a new cluster
-3. Get connection string
-4. Update `MONGO_URL` in backend/.env
 
 ## ⚙️ Environment Configuration
 
