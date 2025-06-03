@@ -919,11 +919,11 @@ const EquipmentDetail = ({ setCurrentView }) => {
                 </div>
               ) : showRequestForm ? (
                 <form onSubmit={handleRequestSubmit} className="space-y-4">
-                  <h3 className="text-lg font-semibold mb-4">Send Rental Request</h3>
+                  <h3 className="text-lg font-semibold mb-4">Mietanfrage senden</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Startdatum</label>
                       <input
                         type="date"
                         required
@@ -935,7 +935,7 @@ const EquipmentDetail = ({ setCurrentView }) => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Enddatum</label>
                       <input
                         type="date"
                         required
@@ -950,20 +950,20 @@ const EquipmentDetail = ({ setCurrentView }) => {
                   {requestForm.start_date && requestForm.end_date && (
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <span>Total Price:</span>
+                        <span>Gesamtpreis:</span>
                         <span className="text-xl font-bold text-blue-600">€{calculateTotalPrice()}</span>
                       </div>
                     </div>
                   )}
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Message to Owner</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nachricht an Besitzer</label>
                     <textarea
                       required
                       rows={3}
                       value={requestForm.message}
                       onChange={(e) => setRequestForm({ ...requestForm, message: e.target.value })}
-                      placeholder="Tell the owner about your rental needs..."
+                      placeholder="Erzähle dem Besitzer von deinen Mietbedürfnissen..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -974,14 +974,14 @@ const EquipmentDetail = ({ setCurrentView }) => {
                       onClick={() => setShowRequestForm(false)}
                       className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                     >
-                      Cancel
+                      Abbrechen
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                     >
-                      {loading ? 'Sending...' : 'Send Request'}
+                      {loading ? 'Wird gesendet...' : 'Anfrage senden'}
                     </button>
                   </div>
                 </form>
