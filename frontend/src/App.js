@@ -315,7 +315,7 @@ const HomePage = ({ setCurrentView }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              How It Works
+              So funktioniert's
             </h2>
           </div>
           
@@ -324,9 +324,9 @@ const HomePage = ({ setCurrentView }) => {
               <div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mb-6 text-xl font-bold">
                 1
               </div>
-              <h3 className="text-xl font-semibold mb-4">List or Browse</h3>
+              <h3 className="text-xl font-semibold mb-4">Inserieren oder Durchsuchen</h3>
               <p className="text-gray-600">
-                List your unused equipment or browse available tools in your area.
+                Inseriere deine ungenutzten Geräte oder durchsuche verfügbare Werkzeuge in deiner Umgebung.
               </p>
             </div>
             
@@ -334,9 +334,9 @@ const HomePage = ({ setCurrentView }) => {
               <div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mb-6 text-xl font-bold">
                 2
               </div>
-              <h3 className="text-xl font-semibold mb-4">Connect & Chat</h3>
+              <h3 className="text-xl font-semibold mb-4">Vernetzen & Chatten</h3>
               <p className="text-gray-600">
-                Send requests and chat with equipment owners to arrange pickup times.
+                Sende Anfragen und chatte mit Gerätebesitzern, um Abholzeiten zu vereinbaren.
               </p>
             </div>
             
@@ -344,9 +344,9 @@ const HomePage = ({ setCurrentView }) => {
               <div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mb-6 text-xl font-bold">
                 3
               </div>
-              <h3 className="text-xl font-semibold mb-4">Share & Earn</h3>
+              <h3 className="text-xl font-semibold mb-4">Teilen & Verdienen</h3>
               <p className="text-gray-600">
-                Complete the rental, pay securely, and build your community reputation.
+                Schließe die Vermietung ab, zahle sicher und baue deinen Ruf in der Gemeinschaft auf.
               </p>
             </div>
           </div>
