@@ -1224,31 +1224,31 @@ const AddEquipment = ({ setCurrentView }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Equipment Title</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Geräte-Titel</label>
               <input
                 type="text"
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g., Professional Welding Machine"
+                placeholder="z.B. Professionelle Schweißmaschine"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Beschreibung</label>
               <textarea
                 required
                 rows={4}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe your equipment, its condition, and any special requirements..."
+                placeholder="Beschreibe dein Gerät, seinen Zustand und spezielle Anforderungen..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -1261,7 +1261,7 @@ const AddEquipment = ({ setCurrentView }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Price per Day (€)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Preis pro Tag (€)</label>
               <input
                 type="number"
                 step="0.01"
@@ -1275,19 +1275,19 @@ const AddEquipment = ({ setCurrentView }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Standort</label>
               <input
                 type="text"
                 required
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Vienna, Salzburg, etc."
+                placeholder="Wien, Salzburg, etc."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Rental Days</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Mindest-Mietdauer (Tage)</label>
               <input
                 type="number"
                 min="1"
@@ -1298,7 +1298,7 @@ const AddEquipment = ({ setCurrentView }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Maximum Rental Days (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Maximale Mietdauer (Optional)</label>
               <input
                 type="number"
                 min="1"
@@ -1310,7 +1310,7 @@ const AddEquipment = ({ setCurrentView }) => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 10)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bilder (Max. 10)</label>
               <input
                 type="file"
                 multiple
@@ -1348,14 +1348,14 @@ const AddEquipment = ({ setCurrentView }) => {
               onClick={() => setCurrentView('browse')}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
-              Cancel
+              Abbrechen
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? 'Creating...' : 'List Equipment'}
+              {loading ? 'Wird erstellt...' : 'Gerät inserieren'}
             </button>
           </div>
         </form>
