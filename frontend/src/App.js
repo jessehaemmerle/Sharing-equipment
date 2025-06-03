@@ -104,33 +104,33 @@ const Navigation = () => {
                   onClick={() => setCurrentView('browse')}
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
                 >
-                  Browse
+                  Durchsuchen
                 </button>
                 <button
                   onClick={() => setCurrentView('my-equipment')}
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
                 >
-                  My Equipment
+                  Meine Geräte
                 </button>
                 <button
                   onClick={() => setCurrentView('requests')}
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
                 >
-                  Requests
+                  Anfragen
                 </button>
                 <button
                   onClick={() => setCurrentView('add-equipment')}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium"
                 >
-                  List Equipment
+                  Gerät inserieren
                 </button>
                 <div className="flex items-center space-x-2">
-                  <span className="text-gray-700">Hi, {user.name}</span>
+                  <span className="text-gray-700">Hallo, {user.name}</span>
                   <button
                     onClick={logout}
                     className="text-gray-500 hover:text-red-600"
                   >
-                    Logout
+                    Abmelden
                   </button>
                 </div>
               </>
