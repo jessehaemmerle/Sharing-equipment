@@ -1,0 +1,113 @@
+# Docker Compose configuration optimized for Traefik reverse proxy
+# Use this if you're using Traefik as your reverse proxy
+
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: toala_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: toala_database
+    volumes:
+      - toala_mongodb_data:/data/db
+    networks:
+      - toala_internal
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend API
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: toala_backend
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=toala_database
+      - JWT_SECRET=${JWT_SECRET:-toala_super_secure_jwt_secret_2024_production}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_HOURS=24
+      - ENVIRONMENT=production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - toala_internal
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      
+      # API routes
+      - "traefik.http.routers.toala-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.toala-api.entrypoints=websecure"
+      - "traefik.http.routers.toala-api.tls=true"
+      - "traefik.http.routers.toala-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.toala-api.loadbalancer.server.port=8001"
+      
+      # Strip /api prefix before forwarding to backend
+      - "traefik.http.middlewares.toala-api-stripprefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.toala-api.middlewares=toala-api-stripprefix"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: toala_frontend
+    restart: unless-stopped
+    environment:
+      - REACT_APP_BACKEND_URL=https://${DOMAIN}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      
+      # Frontend routes (everything except /api)
+      - "traefik.http.routers.toala-frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.toala-frontend.entrypoints=websecure"
+      - "traefik.http.routers.toala-frontend.tls=true"
+      - "traefik.http.routers.toala-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.toala-frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.toala-frontend.priority=1"
+      
+      # Redirect HTTP to HTTPS
+      - "traefik.http.routers.toala-http.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.toala-http.entrypoints=web"
+      - "traefik.http.routers.toala-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  toala_mongodb_data:
+    driver: local
+
+networks:
+  toala_internal:
+    driver: bridge
+    internal: true
+  traefik:
+    external: true

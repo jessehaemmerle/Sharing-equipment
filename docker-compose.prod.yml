@@ -1,0 +1,111 @@
+# Production Docker Compose for VPS with Reverse Proxy
+# Use this for deployment alongside other containers with different domains
+
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: toala_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: toala_database
+    volumes:
+      - toala_mongodb_data:/data/db
+    networks:
+      - toala_internal
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend API
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: toala_backend
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=toala_database
+      - JWT_SECRET=${JWT_SECRET:-toala_super_secure_jwt_secret_2024_production}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_HOURS=24
+      - ENVIRONMENT=production
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - toala_internal
+      - proxy_network
+    labels:
+      # Traefik labels
+      - "traefik.enable=true"
+      - "traefik.http.routers.toala-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.toala-api.tls=true"
+      - "traefik.http.routers.toala-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.toala-api.loadbalancer.server.port=8001"
+      - "traefik.docker.network=proxy_network"
+      
+      # nginx-proxy labels (alternative to Traefik)
+      - "VIRTUAL_HOST=${DOMAIN}"
+      - "VIRTUAL_PATH=/api"
+      - "VIRTUAL_PORT=8001"
+      - "LETSENCRYPT_HOST=${DOMAIN}"
+      - "LETSENCRYPT_EMAIL=${SSL_EMAIL}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: toala_frontend
+    restart: unless-stopped
+    environment:
+      - REACT_APP_BACKEND_URL=https://${DOMAIN}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - proxy_network
+    labels:
+      # Traefik labels
+      - "traefik.enable=true"
+      - "traefik.http.routers.toala-frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.toala-frontend.tls=true"
+      - "traefik.http.routers.toala-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.toala-frontend.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy_network"
+      
+      # nginx-proxy labels (alternative to Traefik)
+      - "VIRTUAL_HOST=${DOMAIN}"
+      - "VIRTUAL_PORT=80"
+      - "LETSENCRYPT_HOST=${DOMAIN}"
+      - "LETSENCRYPT_EMAIL=${SSL_EMAIL}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  toala_mongodb_data:
+    driver: local
+
+networks:
+  toala_internal:
+    driver: bridge
+    internal: true
+  proxy_network:
+    external: true
