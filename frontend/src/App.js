@@ -831,7 +831,7 @@ const EquipmentDetail = ({ setCurrentView }) => {
           onClick={() => setCurrentView('browse')}
           className="mb-6 text-blue-600 hover:text-blue-700 flex items-center"
         >
-          ← Back to Browse
+          ← Zurück zum Durchsuchen
         </button>
         
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
