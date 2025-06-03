@@ -188,56 +188,77 @@ yarn build
 
 ## 🐳 Docker Deployment
 
-### Using Docker Compose
+### Production Deployment (Recommended)
+
+For Ubuntu VPS with automatic setup:
 
 ```bash
-# Create docker-compose.yml in root directory
-docker-compose up -d
+# One-command deployment
+./deploy.sh
 ```
 
-**docker-compose.yml:**
-```yaml
-version: '3.8'
+### Manual Docker Deployment
 
-services:
-  mongodb:
-    image: mongo:7.0
-    container_name: toala_mongodb
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: toala_database
+```bash
+# Create environment file
+cp .env.production .env
+# Edit .env with your configuration
 
-  backend:
-    build: ./backend
-    container_name: toala_backend
-    restart: unless-stopped
-    ports:
-      - "8001:8001"
-    depends_on:
-      - mongodb
-    environment:
-      MONGO_URL: mongodb://mongodb:27017
-      DB_NAME: toala_database
-    volumes:
-      - ./backend:/app
+# Build and start services
+docker-compose up -d --build
 
-  frontend:
-    build: ./frontend
-    container_name: toala_frontend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    environment:
-      REACT_APP_BACKEND_URL: http://localhost:8001
+# Check status
+docker-compose ps
 
-volumes:
-  mongodb_data:
+# View logs
+docker-compose logs -f
+```
+
+### Development with Docker
+
+```bash
+# Use development configuration
+docker-compose -f docker-compose.dev.yml up -d --build
+
+# This provides:
+# - Hot reload for both frontend and backend
+# - Development database
+# - Debug mode enabled
+```
+
+### Docker Management
+
+```bash
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# Restart services
+docker-compose restart
+
+# View logs
+docker-compose logs -f [service_name]
+
+# Update and rebuild
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+
+# Clean up
+docker system prune -a
+```
+
+### Service Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │    Backend      │    │    MongoDB      │
+│   (React)       │    │   (FastAPI)     │    │   (Database)    │
+│   Port: 80      │────│   Port: 8001    │────│   Port: 27017   │
+│   Nginx         │    │   Python        │    │   NoSQL         │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
 ## 🌐 Production Deployment
