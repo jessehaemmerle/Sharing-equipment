@@ -724,12 +724,12 @@ const EquipmentCard = ({ equipment, setCurrentView }) => {
         </div>
         
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500">by {equipment.owner_name}</span>
+          <span className="text-sm text-gray-500">von {equipment.owner_name}</span>
           <button
             onClick={handleViewDetails}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
           >
-            View Details
+            Details ansehen
           </button>
         </div>
       </div>
