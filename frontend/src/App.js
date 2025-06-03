@@ -613,13 +613,13 @@ const BrowseEquipment = ({ setCurrentView }) => {
   };
 
   const categories = [
-    { value: 'power_tools', label: 'Power Tools' },
-    { value: 'lawn_equipment', label: 'Lawn Equipment' },
-    { value: 'welding_equipment', label: 'Welding Equipment' },
-    { value: 'construction_tools', label: 'Construction Tools' },
-    { value: 'automotive', label: 'Automotive' },
-    { value: 'household', label: 'Household' },
-    { value: 'other', label: 'Other' }
+    { value: 'power_tools', label: 'Elektrowerkzeuge' },
+    { value: 'lawn_equipment', label: 'Gartengeräte' },
+    { value: 'welding_equipment', label: 'Schweißgeräte' },
+    { value: 'construction_tools', label: 'Bauwerkzeuge' },
+    { value: 'automotive', label: 'Fahrzeuge & KFZ' },
+    { value: 'household', label: 'Haushalt' },
+    { value: 'other', label: 'Sonstiges' }
   ];
 
   return (
