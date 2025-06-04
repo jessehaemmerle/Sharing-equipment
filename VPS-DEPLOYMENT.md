@@ -8,6 +8,9 @@ Deploy toala.at on your Ubuntu VPS alongside other containers with different dom
 - Existing reverse proxy setup (Traefik or nginx-proxy)
 - Domain name pointing to your VPS
 - SSH access to your VPS
+- **Node.js 20+ required** (for React Router DOM v7 compatibility)
+
+> **Note:** The Docker containers automatically use Node.js 20, so this requirement is handled automatically during deployment.
 
 ## 🔧 Supported Reverse Proxy Configurations
 
