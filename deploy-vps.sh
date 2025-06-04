@@ -333,6 +333,7 @@ main() {
     echo "  Restart application:  ./restart-vps.sh"
     echo "  View logs:           ./logs-vps.sh [service_name]"
     echo "  Update application:  ./update-vps.sh"
+    echo "  Health check:        ./health-check.sh"
     echo
     echo "🌐 Access your application:"
     echo "  Frontend: https://$domain"
