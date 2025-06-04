@@ -294,7 +294,11 @@ EOF
     # Make scripts executable
     chmod +x start-vps.sh stop-vps.sh restart-vps.sh logs-vps.sh update-vps.sh
     
+    # Copy health check script
+    chmod +x health-check.sh
+    
     print_success "Management scripts created!"
+    echo "  Health check:     ./health-check.sh"
 }
 
 # Main deployment function
