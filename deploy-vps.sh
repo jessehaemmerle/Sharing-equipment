@@ -204,25 +204,31 @@ deploy_application() {
     
     # Wait for services to be ready
     print_status "Waiting for services to start..."
-    sleep 30
+    sleep 20
     
-    # Check if services are running
-    if docker-compose -f "$COMPOSE_FILE" ps | grep -q "Up"; then
-        print_success "Application deployed successfully!"
-        
-        echo
-        echo "🎉 Toala.at is now deployed!"
-        echo "📍 Domain: https://$domain"
-        echo "🔧 API Docs: https://$domain/api/docs"
-        echo
-        
-        # Show running containers
-        docker-compose -f "$COMPOSE_FILE" ps
-        
+    # Run health check
+    print_status "Running health checks..."
+    if [ -f "./health-check.sh" ]; then
+        ./health-check.sh
     else
-        print_error "Some services failed to start. Check logs:"
-        docker-compose -f "$COMPOSE_FILE" logs
-        exit 1
+        # Basic checks without the script
+        if docker-compose -f "$COMPOSE_FILE" ps | grep -q "Up"; then
+            print_success "Application deployed successfully!"
+            
+            echo
+            echo "🎉 Toala.at is now deployed!"
+            echo "📍 Domain: https://$domain"
+            echo "🔧 API Docs: https://$domain/api/docs"
+            echo
+            
+            # Show running containers
+            docker-compose -f "$COMPOSE_FILE" ps
+            
+        else
+            print_error "Some services failed to start. Check logs:"
+            docker-compose -f "$COMPOSE_FILE" logs --tail 20
+            exit 1
+        fi
     fi
 }
 
