@@ -225,7 +225,25 @@ docker logs nginx-proxy-letsencrypt 2>&1 | grep -i cert
 
 ### Common Issues
 
-**1. Service Not Accessible**
+**1. Node.js Version Compatibility Error**
+
+```
+Error: react-router-dom@7.5.1: the engine "node" is incompatible with this module. Expected version ">=20.0.0" got "18.x.x"
+```
+
+**Solution:**
+```bash
+# Run the fix script
+./fix-nodejs.sh
+
+# Or manually update Dockerfiles
+find . -name "Dockerfile*" -exec sed -i 's/node:18-alpine/node:20-alpine/g' {} \;
+
+# Rebuild containers
+docker-compose build --no-cache
+```
+
+**2. Service Not Accessible**
 
 ```bash
 # Check if domain resolves to your VPS
