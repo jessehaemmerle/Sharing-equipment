@@ -171,13 +171,22 @@ prepare_compose_file() {
             ;;
     esac
     
+    # Check if user wants to disable health checks for faster deployment
+    read -p "Disable health checks for faster deployment? (recommended) [Y/n]: " disable_health
+    if [[ $disable_health =~ ^[Nn]$ ]]; then
+        print_status "Using health checks (slower startup)"
+    else
+        print_status "Disabling health checks for faster deployment"
+        COMPOSE_FILE="docker-compose.no-healthcheck.yml"
+    fi
+    
     if [ ! -f "$COMPOSE_FILE" ]; then
         print_error "Compose file $COMPOSE_FILE not found!"
         exit 1
     fi
     
     # Update network name in compose file if needed
-    if [ "$PROXY_NETWORK" != "traefik" ] && [ "$PROXY_NETWORK" != "nginx-proxy" ]; then
+    if [ "$COMPOSE_FILE" != "docker-compose.no-healthcheck.yml" ] && [ "$PROXY_NETWORK" != "traefik" ] && [ "$PROXY_NETWORK" != "nginx-proxy" ]; then
         sed "s/traefik/$PROXY_NETWORK/g; s/nginx-proxy/$PROXY_NETWORK/g" "$COMPOSE_FILE" > docker-compose.custom.yml
         COMPOSE_FILE="docker-compose.custom.yml"
     fi
